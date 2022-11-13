@@ -32,8 +32,8 @@
             <th>flight number</th>
             <th>departure</th>
             <th>arrival</th>
-            <th>plane number</th>
             <th>plane capacity</th>
+            <th>plane number</th>
             <th>depart time</th>
             <th>arrival time</th>
             {% for flight in data[0] %}
@@ -41,8 +41,8 @@
                     <td>{{flight.flightnum}}</td>
                     <td>{{flight.departcode}}</td>
                     <td>{{flight.arrivalcode}}</td>
-                    <td>{{flight.numid}}</td>
                     <td>{{flight.capacity}}</td>
+                    <td>{{flight.numid}}</td>
                     <td>{{flight.takeoff}}</td>
                     <td>{{flight.landing}}</td>
                 </tr>

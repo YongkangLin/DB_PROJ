@@ -4,25 +4,25 @@
       font-size: 15pt;
       font-family: arial;
     }
+    .boxed{
+      width: 200px;
+      height: 50px;
+      border: 3px solid black;
+      background-color: bisque;
+    }
   </style>
-
-
-<body>
-  <h1>stupid generic airline</h1>
-
-  <div>
-    {% for n in data %}
-    <div>{{n}}</div>
-    {% endfor %}
-  </div>
-
-<p><a href="another">Go to the other page</a></p>
-
-<form method="POST" action="/add">
-<p>Name of new computer scientist: <input type="text" name="name"> <input type="submit" value="Add"></p>
-</form>
-
-</body>
-
-
+  <body>
+    <h1>stupid generic airline</h1>
+    <img src="https://sayingimages.com/wp-content/uploads/no-captain-needed-airplane-meme.jpg" alt="BEST AIRLINE">
+    <div class="boxed">
+      <center>
+      <p><a href="booking">Book a flight today!</a></p>
+      </center>
+    </div>
+    <div class="boxed">
+      <center>
+      <p><a href="lookup">Confirmation look up!</a></p>
+      </center>
+    </div>
+  </body>
 </html>
