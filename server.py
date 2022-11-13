@@ -1,4 +1,6 @@
 import os
+import random
+import string
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
@@ -28,6 +30,14 @@ def teardown_request(exception):
 def index():
   return render_template("index.html")
 
+@app.context_processor
+def seat():
+  seats = []
+  for i in range(random.randint(3,10)):
+    seat = str(random.randint(1,30)) + random.choice(string.ascii_uppercase)
+    seats.append(seat)
+  return dict(seats=seats)
+
 @app.route('/booking', methods=['GET','POST'])
 def booking():
   if request.method == 'POST':
@@ -35,8 +45,8 @@ def booking():
     depart = request.form['depart'] 
     arrival = request.form['arrival']
     takeoff = request.form['takeoff']
-    query = ("SELECT * FROM flight WHERE departcode = '{}' and ".format(depart) + 
-    "arrivalcode = '{}' and DATE(takeoff) = '{}';".format(arrival,takeoff))
+    query = ("SELECT * FROM flight WHERE departcode ILIKE '{}' and ".format(depart) + 
+    "arrivalcode ILIKE '{}' and DATE(takeoff) = '{}';".format(arrival,takeoff))
     cursor = g.conn.execute(query)
     for result in cursor:
       flights.append(result)
@@ -46,6 +56,13 @@ def booking():
     else:
       return render_template("booking.html", data=[])
   return render_template("booking.html", data=[])
+
+@app.route('/book',methods=['POST'])
+def book():
+  pid = random.randint(0, 999999)
+  name = request.form['name']
+  bday = request.form['bday']
+  id = request.form['ID']
 
 @app.route('/lookup', methods=['GET','POST'])
 def lookup():

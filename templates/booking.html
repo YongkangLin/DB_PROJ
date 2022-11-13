@@ -9,6 +9,14 @@
           font-family: sans-serif;
           background-color:rgb(230, 200, 136);
         }
+        tbody tr:nth-child(even) td{
+        background-color: #89ABE3FF;
+        }
+        tbody tr:nth-child(odd) td{
+        background-color: #EA738DFF;
+        }EA738DFF
+
+        thead tr th { background-color: rgb(255, 255, 255)}
     </style>
     <header>
        BOOK YOUR STUPID FLIGHT HERE 
@@ -16,28 +24,39 @@
     <body>
     <p>
     <form method="POST" action="/booking">
-        Departing airport: <input type="text" name="depart"><br>
-        Arriving airport: <input type="text" name="arrival"><br>
-        Take off date: <input type="date" name="takeoff"><br>
+        Full Name: <input type="text" name="name" required><br>
+        Birthday: <input type="date" name="bday" required><br>
+        Identification: <input type="text" name="ID" required><br>
+        Departing airport: <input type="text" name="depart" required><br>
+        Arriving airport: <input type="text" name="arrival" required><br>
+        Take off date: <input type="date" name="takeoff" required><br>
         <input type="submit" value="search"></p>
     </form>
     <table>
         <th>flight number</th>
         <th>departure</th>
         <th>arrival</th>
-        <th>plane capacity</th>
-        <th>plane number</th>
         <th>depart time</th>
         <th>arrival time</th>
+        <th>price(very cheap)</th>
+        <th>available seats</th>
+        <th>BOOK NOW!</th>
         {% for flight in data[0] %}
             <tr>
                 <td>{{flight.flightnum}}</td>
                 <td>{{flight.departcode}}</td>
                 <td>{{flight.arrivalcode}}</td>
-                <td>{{flight.capacity}}</td>
-                <td>{{flight.numid}}</td>
                 <td>{{flight.takeoff}}</td>
                 <td>{{flight.landing}}</td>
+                <td>{{'%0.2f'| format((range(150, 1500)|random/3)|float)}}</td>
+                <td>
+                    <select name="seats">
+                        {% for seat in seats %}
+                            <option value="{{ seat }}" SELECTED>{{ seat }}</option>
+                        {% endfor %} 
+                    </select>
+                </td>
+                <td><button type="button" onclick="book(name,bday,ID,depart,arrival,takeoff)">select this flight</button></td>
             </tr>
         {% endfor %}
     </table>
