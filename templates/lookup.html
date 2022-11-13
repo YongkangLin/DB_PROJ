@@ -1,0 +1,19 @@
+<html>
+    <style>
+        body{ 
+          font-size: 15pt;
+          font-family: sans-serif;
+        }
+    </style>
+    <body>
+        <form method="POST" action="/lookup">
+        <p>Enter your flight number: <input type="text" name="flightnum"> <input type="submit" value="look up"></p>
+        </form>
+        <div>
+            <div>{{data}}</div>
+            {% for n in data %}
+            <div>{{n}}</div>
+            {% endfor %}
+        </div>
+    </body>
+</html>

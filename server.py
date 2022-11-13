@@ -41,12 +41,6 @@ engine = create_engine(DATABASEURI)
 # Example of running queries in your database
 # Note that this will probably not work if you already have a table named 'test' in your database, containing meaningful data. This is only an example showing you how to run queries in your database using SQLAlchemy.
 #
-engine.execute("""CREATE TABLE IF NOT EXISTS test (
-  id serial,
-  name text
-);""")
-engine.execute("""INSERT INTO test(name) VALUES ('grace hopper'), ('alan turing'), ('ada lovelace');""")
-
 
 @app.before_request
 def before_request():
@@ -109,13 +103,8 @@ def index():
   #
   # example of a database query
   #
-  cursor = g.conn.execute("SELECT name FROM test")
-  names = []
-  for result in cursor:
-    names.append(result['name'])  # can also be accessed using result[0]
-  cursor.close()
 
-  #
+  
   # Flask uses Jinja templates, which is an extension to HTML where you can
   # pass data to a template and dynamically generate HTML based on the data
   # (you can think of it as simple PHP)
@@ -141,14 +130,13 @@ def index():
   #     <div>{{n}}</div>
   #     {% endfor %}
   #
-  context = dict(data = names)
 
 
   #
   # render_template looks in the templates/ folder for files.
   # for example, the below file reads template/index.html
   #
-  return render_template("index.html", **context)
+  return render_template("index.html")
 
 #
 # This is an example of a different path.  You can see it at:
@@ -162,13 +150,22 @@ def index():
 def another():
   return render_template("another.html")
 
+@app.route('/lookup', methods=['POST','GET'])
+def lookup():
+  flights = []
+  flightNum = request.form['flightnum']
+  cursor = g.conn.execute('SELECT * FROM flight WHERE flightnum = (%s);', flightNum)
+  for result in cursor:
+    flights.append(result)  # can also be accessed using result[0]
+  cursor.close()
+  return render_template("lookup.html", data=[flights])
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
 def add():
   name = request.form['name']
-  g.conn.execute('INSERT INTO test(name) VALUES (%s)', name)
-  return redirect('/')
+  g.conn.execute('INSERT INTO airplane(model) VALUES (%s)', name)
+  return redirect('/lookup')
 
 
 @app.route('/login')
