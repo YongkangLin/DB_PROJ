@@ -154,8 +154,9 @@ def another():
 def lookup():
   if request.method == 'POST':
     flights = []
-    flightNum = request.form['flightnum']
-    cursor = g.conn.execute('SELECT * FROM flight WHERE flightnum = (%s);', flightNum)
+    confirm = request.form['confirm'] 
+    query = "SELECT * FROM flight as f, (SELECT flightnum FROM booked_on WHERE confirm = '{}') as s WHERE f.flightnum = s.flightnum;".format(confirm)
+    cursor = g.conn.execute(query)
     for result in cursor:
       flights.append(result)  # can also be accessed using result[0]
     cursor.close()

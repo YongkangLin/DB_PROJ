@@ -20,18 +20,20 @@
 
     </style>
     <header>
-        <center>FLIGHT LOOK UP PAGE!!!</center>
+        <center>BOOKING LOOK UP PAGE!!!</center>
     </header>
     <body>
         <center>
         <form method="POST" action="/lookup">
-        <p>Enter your flight number: <input type="text" name="flightnum"> <input type="submit" value="look up"></p>
+        <p>Enter your confirmation number: <input type="text" name="confirm"> <input type="submit" value="look up"></p>
         </form>
         </center>
         <table>
             <th>flight number</th>
             <th>departure</th>
             <th>arrival</th>
+            <th>plane number</th>
+            <th>plane capacity</th>
             <th>depart time</th>
             <th>arrival time</th>
             {% for flight in data[0] %}
@@ -39,6 +41,8 @@
                     <td>{{flight.flightnum}}</td>
                     <td>{{flight.departcode}}</td>
                     <td>{{flight.arrivalcode}}</td>
+                    <td>{{flight.numid}}</td>
+                    <td>{{flight.capacity}}</td>
                     <td>{{flight.takeoff}}</td>
                     <td>{{flight.landing}}</td>
                 </tr>
