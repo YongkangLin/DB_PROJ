@@ -48,15 +48,15 @@
                 <td>{{flight.arrivalcode}}</td>
                 <td>{{flight.takeoff}}</td>
                 <td>{{flight.landing}}</td>
-                <td>{{'%0.2f'| format((range(150, 1500)|random/3)|float)}}</td>
+                <td value="price">{{'%0.2f'| format((range(150, 1500)|random/3)|float)}}</td>
                 <td>
                     <select name="seats">
                         {% for seat in seats %}
-                            <option value="{{ seat }}" SELECTED>{{ seat }}</option>
+                            <option value="{{seat}}" SELECTED>{{seat}}</option>
                         {% endfor %} 
                     </select>
                 </td>
-                <td><button type="button" onclick="book(name,bday,ID,depart,arrival,takeoff)">select this flight</button></td>
+                <td><a href="/book"></a><button type="button" onclick="book(name,bday,ID,depart,arrival,takeoff)">select this flight</button></td>
             </tr>
         {% endfor %}
     </table>

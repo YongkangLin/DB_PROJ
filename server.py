@@ -32,10 +32,10 @@ def index():
 
 @app.context_processor
 def seat():
-  seats = []
+  seats = set()
   for i in range(random.randint(3,10)):
-    seat = str(random.randint(1,30)) + random.choice(string.ascii_uppercase)
-    seats.append(seat)
+    seat = str(random.randint(1,30)) + random.choice(['A','B','C','D','E'])
+    seats.add(seat)
   return dict(seats=seats)
 
 @app.route('/booking', methods=['GET','POST'])
@@ -58,11 +58,17 @@ def booking():
   return render_template("booking.html", data=[])
 
 @app.route('/book',methods=['POST'])
-def book():
+def book(name,bday,ID,depart,arrival,takeoff):
   pid = random.randint(0, 999999)
   name = request.form['name']
   bday = request.form['bday']
   id = request.form['ID']
+  depart = request.form['depart']
+  arrival = request.form['arrival']
+  takeoff = request.form['takeoff']
+  price = request.form['price']
+  seat = request.form['seat']
+  print(name)
 
 @app.route('/lookup', methods=['GET','POST'])
 def lookup():
