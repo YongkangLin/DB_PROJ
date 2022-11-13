@@ -1,19 +1,47 @@
 <html>
     <style>
+        header{
+            font-size: 30pt;
+            font-family: 'Courier New', Courier, monospace;
+        }
         body{ 
           font-size: 15pt;
           font-family: sans-serif;
         }
+        tbody tr:nth-child(even) td{
+        background-color: #89ABE3FF;
+        }
+        tbody tr:nth-child(odd) td{
+        background-color: #EA738DFF;
+        }
+
+        thead tr th { background-color: rgb(255, 255, 255)}
+
     </style>
+    <header>
+        <center>FLIGHT LOOK UP PAGE!!!</center>
+    </header>
     <body>
+        <center>
         <form method="POST" action="/lookup">
         <p>Enter your flight number: <input type="text" name="flightnum"> <input type="submit" value="look up"></p>
         </form>
-        <div>
-            <div>{{data}}</div>
-            {% for n in data %}
-            <div>{{n}}</div>
+        </center>
+        <table>
+            <th>flight number</th>
+            <th>departure</th>
+            <th>arrival</th>
+            <th>depart time</th>
+            <th>arrival time</th>
+            {% for flight in data[0] %}
+                <tr>
+                    <td>{{flight.flightnum}}</td>
+                    <td>{{flight.departcode}}</td>
+                    <td>{{flight.arrivalcode}}</td>
+                    <td>{{flight.takeoff}}</td>
+                    <td>{{flight.landing}}</td>
+                </tr>
             {% endfor %}
-        </div>
+        </table>
     </body>
 </html>

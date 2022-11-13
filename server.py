@@ -150,15 +150,20 @@ def index():
 def another():
   return render_template("another.html")
 
-@app.route('/lookup', methods=['POST','GET'])
+@app.route('/lookup', methods=['GET','POST'])
 def lookup():
-  flights = []
-  flightNum = request.form['flightnum']
-  cursor = g.conn.execute('SELECT * FROM flight WHERE flightnum = (%s);', flightNum)
-  for result in cursor:
-    flights.append(result)  # can also be accessed using result[0]
-  cursor.close()
-  return render_template("lookup.html", data=[flights])
+  if request.method == 'POST':
+    flights = []
+    flightNum = request.form['flightnum']
+    cursor = g.conn.execute('SELECT * FROM flight WHERE flightnum = (%s);', flightNum)
+    for result in cursor:
+      flights.append(result)  # can also be accessed using result[0]
+    cursor.close()
+    if len(flights) > 0:
+      return render_template("lookup.html", data=[flights])
+    else:
+      return render_template("lookup.html")
+  return render_template("lookup.html")
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
