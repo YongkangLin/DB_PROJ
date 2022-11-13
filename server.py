@@ -162,8 +162,8 @@ def lookup():
     if len(flights) > 0:
       return render_template("lookup.html", data=[flights])
     else:
-      return render_template("lookup.html")
-  return render_template("lookup.html")
+      return render_template("lookup.html", data=[])
+  return render_template("lookup.html", data=[])
 
 # Example of adding new data to the database
 @app.route('/add', methods=['POST'])
