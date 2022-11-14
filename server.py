@@ -47,7 +47,7 @@ def booking():
     form = []
     flights = []
     pid = random.randint(0, 999999)
-    price = random.uniform(50,500)
+    price = "$" + str(round(random.uniform(50,500),2))
     name = request.form['name']
     bday = request.form['bday']
     id = request.form['ID']
