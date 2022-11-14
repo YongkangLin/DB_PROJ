@@ -23,13 +23,13 @@
     </header>
     <body>
     <p>
-    <form method="POST" action="/booking">
-        Full Name: <input type="text" name="name" required><br>
+    <form id = "form" method="POST" action="/booking">
+        Full Name: <input type="text" name = "name" required><br>
         Birthday: <input type="date" name="bday" required><br>
         Identification: <input type="text" name="ID" required><br>
         Departing airport: <input type="text" name="depart" required><br>
         Arriving airport: <input type="text" name="arrival" required><br>
-        Take off date: <input type="date" name="takeoff" required><br>
+        Take off date: <input type="date" name="takeoff" id="takeoff" required><br>
         <input type="submit" value="search"></p>
     </form>
     <table>
@@ -41,22 +41,35 @@
         <th>price(very cheap)</th>
         <th>available seats</th>
         <th>BOOK NOW!</th>
-        {% for flight in data[0] %}
+        {% for flight in data[1] %}
             <tr>
                 <td>{{flight.flightnum}}</td>
                 <td>{{flight.departcode}}</td>
                 <td>{{flight.arrivalcode}}</td>
                 <td>{{flight.takeoff}}</td>
                 <td>{{flight.landing}}</td>
-                <td value="price">{{'%0.2f'| format((range(150, 1500)|random/3)|float)}}</td>
+                <td >{{data[0][7]}}</td>
                 <td>
-                    <select name="seats">
+                    <select id="seats">
                         {% for seat in seats %}
                             <option value="{{seat}}" SELECTED>{{seat}}</option>
                         {% endfor %} 
                     </select>
                 </td>
-                <td><a href="/book"></a><button type="button" onclick="book(name,bday,ID,depart,arrival,takeoff)">select this flight</button></td>
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+                <script>
+                    function book(form){
+                        $.ajax({
+	                        type : "POST",
+	                        url : '/book',
+	                        dataType: "json",
+	                        data: JSON.stringify(form),
+	                        contentType: 'application/json;charset=UTF-8',
+                            success: function(bday){console.log(bday);}
+	                    })
+                    };
+                </script>
+                <td><button type="button" onclick="book({{data[0]}})">select this flight</button></td>
             </tr>
         {% endfor %}
     </table>

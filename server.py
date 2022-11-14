@@ -1,6 +1,8 @@
 import os
+import sys
 import random
 import string
+import logging
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
@@ -9,6 +11,7 @@ tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
 DATABASEURI = "postgresql://aea2185:1936@34.75.94.195/proj1part2"
 engine = create_engine(DATABASEURI)
+logging.basicConfig(level=logging.DEBUG)
 
 @app.before_request
 def before_request():
@@ -41,10 +44,24 @@ def seat():
 @app.route('/booking', methods=['GET','POST'])
 def booking():
   if request.method == 'POST':
+    form = []
     flights = []
-    depart = request.form['depart'] 
+    pid = random.randint(0, 999999)
+    price = random.uniform(50,500)
+    name = request.form['name']
+    bday = request.form['bday']
+    id = request.form['ID']
+    depart = request.form['depart']
     arrival = request.form['arrival']
     takeoff = request.form['takeoff']
+    form.append(pid)
+    form.append(name)
+    form.append(bday)
+    form.append(id)
+    form.append(depart)
+    form.append(arrival)
+    form.append(takeoff)
+    form.append(price)
     query = ("SELECT * FROM flight WHERE departcode ILIKE '{}' and ".format(depart) + 
     "arrivalcode ILIKE '{}' and DATE(takeoff) = '{}';".format(arrival,takeoff))
     cursor = g.conn.execute(query)
@@ -52,23 +69,23 @@ def booking():
       flights.append(result)
     cursor.close()
     if len(flights) > 0:
-      return render_template("booking.html", data=[flights])
+      return render_template("booking.html", data=[form,flights])
     else:
       return render_template("booking.html", data=[])
   return render_template("booking.html", data=[])
 
-@app.route('/book',methods=['POST'])
-def book(name,bday,ID,depart,arrival,takeoff):
-  pid = random.randint(0, 999999)
-  name = request.form['name']
-  bday = request.form['bday']
-  id = request.form['ID']
-  depart = request.form['depart']
-  arrival = request.form['arrival']
-  takeoff = request.form['takeoff']
-  price = request.form['price']
-  seat = request.form['seat']
-  print(name)
+@app.route('/book', methods=['POST'])
+def book():
+  content = request.json
+  pid = content[0]
+  name = content[1]
+  bday = content[2]
+  ID = content[3]
+  query = ("INSERT INTO passenger VALUES('{}','{}','{}','{}');".format(pid,name,bday,ID))
+  cursor = g.conn.execute(query)
+  app.logger.debug(request.json)
+  return redirect('/booking')
+
 
 @app.route('/lookup', methods=['GET','POST'])
 def lookup():
@@ -98,5 +115,5 @@ if __name__ == "__main__":
     HOST, PORT = host, port
     print("running on %s:%d" % (HOST, PORT))
     app.config['TEMPLATES_AUTO_RELOAD'] = True
-    app.run(host=HOST, port=PORT, debug=debug, threaded=threaded)
+    app.run(host=HOST, port=PORT, debug=True, threaded=threaded)
   run()
