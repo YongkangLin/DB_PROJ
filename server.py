@@ -3,7 +3,7 @@ import sys
 import random
 import string
 import logging
-import datetime
+from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
@@ -88,7 +88,9 @@ def booking():
 
 @app.route('/success', methods=['GET','POST'])
 def success():
-  return render_template("success.html")
+  if request.method == 'POST':
+    return render_template("success.html",data=[request.json])
+  return render_template("success.html",data=[])
 
 @app.route('/book', methods=['POST'])
 def book():
@@ -107,10 +109,10 @@ def book():
   flightnum = content[1]['flightnum']
   booktime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
   g.conn.execute("INSERT INTO passenger VALUES('{}','{}','{}','{}');".format(pid,name,bday,ID))
-  g.conn.execute("INSERT INTO booked_by VALUES('{}','{}');".format(pid,confirm))
-  g.conn.execute("INSERT INTO booking VALUES('{}','{}','{}','{}','{}','{}','{}');".format
-  (confirm,price,seat,flightnum,takeoff,pid,booktime))
-  g.conn.execute("INSERT INTO booked_on VALUES('{}','{}','{}');".format(confirm,flightnum,takeoff))
+  #g.conn.execute("INSERT INTO booked_by VALUES('{}','{}');".format(pid,confirm))
+  #g.conn.execute("INSERT INTO booking VALUES('{}','{}','{}','{}','{}','{}','{}');".format
+  #(confirm,price,seat,flightnum,takeoff,pid,booktime))
+  #g.conn.execute("INSERT INTO booked_on VALUES('{}','{}','{}');".format(confirm,flightnum,takeoff))
   return redirect('/booking')
 
 

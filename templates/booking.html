@@ -77,11 +77,20 @@
 	                        data: JSON.stringify([form,flight]),
 	                        contentType: 'application/json;charset=UTF-8',
                             success: function(){
-                                window.location.href = '/success';
+                                window.alert("Booking Success!\n" +
+                                "Confirmation Code: " + form[7] + "\n" +
+                                "Passenger Name: " + form[1] + "\n" +
+                                "Passenger DOB: " + form[2] + "\n" +
+                                "Passenger ID: " + form[3] + "\n" +
+                                "Passenger Seat: " + form[8] + "\n" +  
+                                "Depart: " + form[4] + ", Arrival: " + form[5] + "\n" +
+                                "Travel Date: " + form[6] +
+                                "\nPRESSING OK WILL RETURN YOU TO HOME PAGE");
+                                window.location.href = '/'
                             },
                             error: function(request, error){
-                                console.log("error occured!")
-                                console.log(error);
+                                window.alert("Booking Failed! ):\n" + 
+                                "Request: " + request + " Error: " + error);
                             }
 	                    })
                     };
