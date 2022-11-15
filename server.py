@@ -70,6 +70,9 @@ def booking():
       result['landing'] = result['landing'].strftime('%Y-%m-%d %H:%M:%S')
       result['price'] = price
       result['seats'] = seats
+      airplane = g.conn.execute("SELECT capacity FROM airplane WHERE numid = '{}';".format(result['numid']))
+      for capacity in airplane:
+        result['capacity'] = capacity['capacity']
       flights.append(result)
     cursor.close()
     if len(flights) > 0:
@@ -77,12 +80,6 @@ def booking():
     else:
       return render_template("booking.html", data=[])
   return render_template("booking.html", data=[])
-
-@app.route('/success', methods=['GET','POST'])
-def success():
-  if request.method == 'POST':
-    return render_template("success.html",data=[request.json])
-  return render_template("success.html",data=[])
 
 @app.route('/book', methods=['POST'])
 def book():
@@ -103,6 +100,8 @@ def book():
   (confirm,price,seat,flightnum,takeoff,pid,booktime))
   g.conn.execute("INSERT INTO booked_by VALUES('{}','{}');".format(pid,confirm))
   g.conn.execute("INSERT INTO booked_on VALUES('{}','{}','{}');".format(confirm,flightnum,takeoff))
+  cursor = g.conn.execute("SELECT * FROM booked_on WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))  
+  g.conn.execute("UPDATE flight SET passengers = '{}' WHERE flightnum = '{}' and takeoff = '{}';".format(len(list(cursor)),flightnum,takeoff))
   return redirect('/booking')
 
 
