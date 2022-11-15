@@ -98,10 +98,19 @@ def book():
   name = content[0][1]
   bday = content[0][2]
   ID = content[0][3]
+  depart = content[0][4]
+  arrival = content[0][5]
+  takeoff = content[0][6]
+  confirm = content[0][7] 
   seat = content[0][8]
-  query = ("INSERT INTO passenger VALUES('{}','{}','{}','{}');".format(pid,name,bday,ID))
-  cursor = g.conn.execute(query)
-  app.logger.debug(request.json)
+  price = content[1]['price']
+  flightnum = content[1]['flightnum']
+  booktime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+  g.conn.execute("INSERT INTO passenger VALUES('{}','{}','{}','{}');".format(pid,name,bday,ID))
+  g.conn.execute("INSERT INTO booked_by VALUES('{}','{}');".format(pid,confirm))
+  g.conn.execute("INSERT INTO booking VALUES('{}','{}','{}','{}','{}','{}','{}');".format
+  (confirm,price,seat,flightnum,takeoff,pid,booktime))
+  g.conn.execute("INSERT INTO booked_on VALUES('{}','{}','{}');".format(confirm,flightnum,takeoff))
   return redirect('/booking')
 
 
