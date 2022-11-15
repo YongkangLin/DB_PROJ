@@ -48,28 +48,35 @@
                 <td>{{flight.arrivalcode}}</td>
                 <td>{{flight.takeoff}}</td>
                 <td>{{flight.landing}}</td>
-                <td >{{data[0][7]}}</td>
+                <td >{{flight.price}}</td>
                 <td>
-                    <select id="seats">
-                        {% for seat in seats %}
-                            <option value="{{seat}}" SELECTED>{{seat}}</option>
-                        {% endfor %} 
-                    </select>
+                <select id={{flight.flightnum}}>
+                    {% for seat in flight.seats %}
+                        <option id = "seat" value="{{seat}}" SELECTED = "{{seat}}">{{seat}}</option>
+                    {% endfor %} 
+                </select>
                 </td>
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
                 <script>
-                    function book(form){
+                    function book(form,seat){
+                        console.log(document.getElementById(seat).value)
                         $.ajax({
 	                        type : "POST",
 	                        url : '/book',
-	                        dataType: "json",
+	                        dataType: "text",
 	                        data: JSON.stringify(form),
 	                        contentType: 'application/json;charset=UTF-8',
-                            success: function(bday){console.log(bday);}
+                            success: function(){
+                                window.location.href = '/success';
+                            },
+                            error: function(request, error){
+                                console.log("error occured!")
+                                console.log(error);
+                            }
 	                    })
                     };
                 </script>
-                <td><button type="button" onclick="book(data[0])">select this flight</button></td>
+                <td><button type="button" onclick="book({{data}},{{flight.flightnum}})">select this flight</button></td>
             </tr>
         {% endfor %}
     </table>

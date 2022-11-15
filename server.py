@@ -3,6 +3,7 @@ import sys
 import random
 import string
 import logging
+import datetime
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
@@ -47,7 +48,7 @@ def booking():
     form = []
     flights = []
     pid = random.randint(0, 999999)
-    price = "$" + str(round(random.uniform(50,500),2))
+    confirm = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
     name = request.form['name']
     bday = request.form['bday']
     id = request.form['ID']
@@ -61,11 +62,23 @@ def booking():
     form.append(depart)
     form.append(arrival)
     form.append(takeoff)
-    form.append(price)
+    form.append(confirm)
     query = ("SELECT * FROM flight WHERE departcode ILIKE '{}' and ".format(depart) + 
     "arrivalcode ILIKE '{}' and DATE(takeoff) = '{}';".format(arrival,takeoff))
     cursor = g.conn.execute(query)
     for result in cursor:
+      seats = []
+      result = result._asdict()
+      price = "$" + str(round(random.uniform(50,500),2))
+
+      for i in range(random.randint(3,10)):
+        seat = str(random.randint(1,30)) + random.choice(['A','B','C','D','E'])
+        seats.append(seat)
+      result['takeoff'] = result['takeoff'].strftime('%Y-%m-%d %H:%M:%S')
+      result['landing'] = result['landing'].strftime('%Y-%m-%d %H:%M:%S')
+      result['price'] = price
+      result['seats'] = seats
+      app.logger.debug(result)
       flights.append(result)
     cursor.close()
     if len(flights) > 0:
@@ -74,13 +87,18 @@ def booking():
       return render_template("booking.html", data=[])
   return render_template("booking.html", data=[])
 
+@app.route('/success', methods=['GET','POST'])
+def success():
+  return render_template("success.html")
+
 @app.route('/book', methods=['POST'])
 def book():
   content = request.json
-  pid = content[0]
-  name = content[1]
-  bday = content[2]
-  ID = content[3]
+  app.logger.debug(content)
+  pid = content[0][0]
+  name = content[0][1]
+  bday = content[0][2]
+  ID = content[0][3]
   query = ("INSERT INTO passenger VALUES('{}','{}','{}','{}');".format(pid,name,bday,ID))
   cursor = g.conn.execute(query)
   app.logger.debug(request.json)
@@ -96,7 +114,7 @@ def lookup():
     "WHERE confirm = '{}') as s WHERE f.flightnum = s.flightnum;".format(confirm))
     cursor = g.conn.execute(query)
     for result in cursor:
-      flights.append(result)  # can also be accessed using result[0]
+      flights.append(result)
     cursor.close()
     if len(flights) > 0:
       return render_template("lookup.html", data=[flights])
