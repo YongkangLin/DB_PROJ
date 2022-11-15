@@ -34,14 +34,6 @@ def teardown_request(exception):
 def index():
   return render_template("index.html")
 
-@app.context_processor
-def seat():
-  seats = set()
-  for i in range(random.randint(3,10)):
-    seat = str(random.randint(1,30)) + random.choice(['A','B','C','D','E'])
-    seats.add(seat)
-  return dict(seats=seats)
-
 @app.route('/booking', methods=['GET','POST'])
 def booking():
   if request.method == 'POST':
@@ -69,7 +61,7 @@ def booking():
     for result in cursor:
       seats = []
       result = result._asdict()
-      price = "$" + str(round(random.uniform(50,500),2))
+      price = round(random.uniform(50,500),2)
 
       for i in range(random.randint(3,10)):
         seat = str(random.randint(1,30)) + random.choice(['A','B','C','D','E'])
@@ -100,19 +92,17 @@ def book():
   name = content[0][1]
   bday = content[0][2]
   ID = content[0][3]
-  depart = content[0][4]
-  arrival = content[0][5]
-  takeoff = content[0][6]
   confirm = content[0][7] 
   seat = content[0][8]
+  takeoff = content[1]['takeoff']
   price = content[1]['price']
   flightnum = content[1]['flightnum']
   booktime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
   g.conn.execute("INSERT INTO passenger VALUES('{}','{}','{}','{}');".format(pid,name,bday,ID))
-  #g.conn.execute("INSERT INTO booked_by VALUES('{}','{}');".format(pid,confirm))
-  #g.conn.execute("INSERT INTO booking VALUES('{}','{}','{}','{}','{}','{}','{}');".format
-  #(confirm,price,seat,flightnum,takeoff,pid,booktime))
-  #g.conn.execute("INSERT INTO booked_on VALUES('{}','{}','{}');".format(confirm,flightnum,takeoff))
+  g.conn.execute("INSERT INTO booking VALUES('{}','{}','{}','{}','{}','{}','{}');".format
+  (confirm,price,seat,flightnum,takeoff,pid,booktime))
+  g.conn.execute("INSERT INTO booked_by VALUES('{}','{}');".format(pid,confirm))
+  g.conn.execute("INSERT INTO booked_on VALUES('{}','{}','{}');".format(confirm,flightnum,takeoff))
   return redirect('/booking')
 
 
