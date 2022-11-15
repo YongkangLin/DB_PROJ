@@ -7,19 +7,28 @@
         body{ 
           font-size: 15pt;
           font-family: sans-serif;
-          background-color:rgb(230, 200, 136);
+          background-color:rgb(240, 212, 152);
         }
         tbody tr:nth-child(even) td{
-        background-color: #89ABE3FF;
+            background-color: #89ABE3FF;
         }
         tbody tr:nth-child(odd) td{
-        background-color: #EA738DFF;
-        }EA738DFF
-
-        thead tr th { background-color: rgb(255, 255, 255)}
+            background-color: #EA738DFF;
+        }
+        thead tr th { 
+            background-color: rgb(255, 255, 255)
+        }
+        .boxed{
+            width: 700px;
+            height: 50px;
+            border: 3px solid black;
+            background-color: rgb(200, 255, 250);
+        }
     </style>
     <header>
-       BOOK YOUR STUPID FLIGHT HERE 
+    <div class="boxed">
+       BOOK YOUR STUPID FLIGHT HERE!
+    </div class="boxed">
     </header>
     <body>
     <p>
@@ -58,13 +67,14 @@
                 </td>
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
                 <script>
-                    function book(form,seat){
-                        console.log(document.getElementById(seat).value)
+                    function book(form,flight){
+                        seats = document.getElementById(flight.flightnum).value
+                        form.push(seats)
                         $.ajax({
 	                        type : "POST",
 	                        url : '/book',
 	                        dataType: "text",
-	                        data: JSON.stringify(form),
+	                        data: JSON.stringify([form,flight]),
 	                        contentType: 'application/json;charset=UTF-8',
                             success: function(){
                                 window.location.href = '/success';
@@ -76,7 +86,7 @@
 	                    })
                     };
                 </script>
-                <td><button type="button" onclick="book({{data}},{{flight.flightnum}})">select this flight</button></td>
+                <td><button type="button" onclick="book({{data[0]}},{{flight}})">select this flight</button></td>
             </tr>
         {% endfor %}
     </table>

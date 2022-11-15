@@ -78,7 +78,6 @@ def booking():
       result['landing'] = result['landing'].strftime('%Y-%m-%d %H:%M:%S')
       result['price'] = price
       result['seats'] = seats
-      app.logger.debug(result)
       flights.append(result)
     cursor.close()
     if len(flights) > 0:
@@ -99,6 +98,7 @@ def book():
   name = content[0][1]
   bday = content[0][2]
   ID = content[0][3]
+  seat = content[0][8]
   query = ("INSERT INTO passenger VALUES('{}','{}','{}','{}');".format(pid,name,bday,ID))
   cursor = g.conn.execute(query)
   app.logger.debug(request.json)
