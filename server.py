@@ -34,6 +34,10 @@ def teardown_request(exception):
 def index():
   return render_template("index.html")
 
+@app.route('/admin')
+def admin():
+  return render_template("admin.html")
+
 @app.route('/booking', methods=['GET','POST'])
 def booking():
   if request.method == 'POST':
@@ -81,7 +85,23 @@ def booking():
       return render_template("booking.html", data=[])
   return render_template("booking.html", data=[])
 
-@app.route('/book', methods=['POST'])
+@app.route('/modairport',methods=['POST'])
+def modairport():
+  code = request.form['code']
+  city = request.form['city']
+  country = request.form['country']
+  if request.form['submit'] == 'add':
+    g.conn.execute("INSERT INTO airport VALUES('{}','{}','{}');".format(code,city,country))
+  if request.form['submit'] == 'delete':
+    g.conn.execute("DELETE FROM airport WHERE code = '{}';".format(code))
+  return redirect('/admin')
+
+@app.route('/modpilot',methods=['POST'])
+def modpilot():
+  app.logger.debug(request.form['submit'])
+
+@app.route(
+  '/book', methods=['POST'])
 def book():
   content = request.json
   app.logger.debug(content)
