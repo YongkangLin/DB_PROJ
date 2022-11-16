@@ -27,7 +27,7 @@
     <br>
     <div class="boxed2">
         Modify Pilot Database
-        <form action="/modpilot" method="post">
+        <form id="pilot" action="/modpilot" method="post">
             Pilot ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="id"><br>
             Pilot Name:&nbsp;&nbsp;&nbsp;<input type="text" name="name"><br>
             Pilot Rank:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="rank"><br>
@@ -38,11 +38,22 @@
     </div>
     <script>
         airport = document.getElementById("airport");
-        airport.addEventListener('submit', submitted);
-        function submitted(event) {
+        airport.addEventListener('submit', airportf);
+        function airportf(event) {
             var data = $("#airport").serializeArray();
             var x = ("Airport database modified:\ncode: "+data[0].value+ "\n" +
             "city: "+data[1].value + "\n" + "country: " + data[2].value)
+            window.alert(x)
+        }
+    </script>
+    <script>
+        pilot = document.getElementById("pilot");
+        pilot.addEventListener('submit', pilotf);
+        function pilotf(event) {
+            var data = $("#pilot").serializeArray();
+            var x = ("Pilot database modified:\nPilot ID: "+data[0].value+ "\n" +
+            "Pilot Name: "+data[1].value + "\n" + "Pilot Rank: " + data[2].value
+            + "\n" + "Flight Hours: " + data[3].value)
             window.alert(x)
         }
     </script>

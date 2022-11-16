@@ -98,7 +98,16 @@ def modairport():
 
 @app.route('/modpilot',methods=['POST'])
 def modpilot():
-  app.logger.debug(request.form['submit'])
+  app.logger.debug(request.form)
+  pilotid = request.form['id']
+  name = request.form['name']
+  fhours = request.form['hours']
+  rank = request.form['rank']
+  if request.form['submit'] == 'add':
+    g.conn.execute("INSERT INTO pilot VALUES('{}','{}','{}','{}');".format(pilotid,name,fhours,rank))
+  if request.form['submit'] == 'delete':
+    g.conn.execute("DELETE FROM pilot WHERE pilotid = '{}';".format(pilotid))
+  return redirect('/admin')
 
 @app.route(
   '/book', methods=['POST'])
