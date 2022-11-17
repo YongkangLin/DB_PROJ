@@ -25,16 +25,16 @@
     </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
             <script>
-                function cancel(flight,confirm){
+                function cancel(data){
                     console.log("test")
                     $.ajax({
                         type : "POST",
                         url : '/cancel',
                         dataType: "text",
-                        data: JSON.stringify([flight,confirm]),
+                        data: JSON.stringify(data),
                         contentType: 'application/json;charset=UTF-8',
                         success: function(){
-                            window.alert("Cancel success!\nConfirmation Code: " + confirm)
+                            window.alert("Cancel success!\nConfirmation Code: " + data[1])
                         },
                         error: function(request, error){
                             window.alert("Cancel Failed!\n" + 

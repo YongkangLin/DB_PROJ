@@ -210,13 +210,14 @@ def modplane():
 @app.route('/cancel',methods=['POST'])
 def cancel():
   app.logger.debug(request.json)
-  confirm = request.json[0][1]
-  flightnum = request.json[0][0]['flightnum']
-  takeoff = request.json[0][0]['takeoff']
+  confirm = request.json[1]
+  flightnum = request.json[0]['flightnum']
+  takeoff = request.json[0]['takeoff']
   g.conn.execute("DELETE FROM booked_by WHERE confirm ILIKE '{}';".format(confirm))
   g.conn.execute("DELETE FROM booked_on WHERE confirm ILIKE '{}';".format(confirm))
   g.conn.execute("DELETE FROM booking WHERE confirm ILIKE '{}';".format(confirm))
-  cursor = g.conn.execute("SELECT * FROM booked_on WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))  
+  cursor = g.conn.execute("SELECT * FROM booked_on WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
+  app.logger.debug(list(cursor))  
   g.conn.execute("UPDATE flight SET passengers = '{}' WHERE flightnum = '{}' and takeoff = '{}';".format(len(list(cursor)),flightnum,takeoff))
   return redirect('/manage')
 
