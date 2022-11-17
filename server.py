@@ -8,12 +8,26 @@ from datetime import datetime
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash, check_password_hash
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
+auth = HTTPBasicAuth()
 app = Flask(__name__, template_folder=tmpl_dir)
 DATABASEURI = "postgresql://aea2185:1936@34.75.94.195/proj1part2"
 engine = create_engine(DATABASEURI)
 logging.basicConfig(level=logging.DEBUG)
+
+users = {
+    "yong": generate_password_hash("pog"),
+    "antonio": generate_password_hash("mid")
+}
+
+@auth.verify_password
+def verify_password(username, password):
+  if username in users and \
+      check_password_hash(users.get(username), password):
+    return username
 
 @app.before_request
 def before_request():
@@ -36,6 +50,7 @@ def index():
   return render_template("index.html")
 
 @app.route('/admin')
+@auth.login_required
 def admin():
   data = []
   airport = []
