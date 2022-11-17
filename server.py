@@ -174,10 +174,11 @@ def modflight():
     g.conn.execute("INSERT INTO flown_by VALUES('{}','{}','{}');".format(pilot,flightnum,takeoff))
     g.conn.execute("INSERT INTO assigned_to VALUES('{}','{}','{}');".format(plane,flightnum,takeoff))
   if request.form['submit'] == 'delete':
-    g.conn.execute("DELETE FROM flight WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
     g.conn.execute("DELETE FROM lands_in WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
     g.conn.execute("DELETE FROM departs_from WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
     g.conn.execute("DELETE FROM assigned_to WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
+    g.conn.execute("DELETE FROM flown_by WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
+    g.conn.execute("DELETE FROM flight WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
   return redirect('/admin')
 
 @app.route('/modpilot',methods=['POST'])
