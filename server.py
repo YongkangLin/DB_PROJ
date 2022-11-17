@@ -110,7 +110,6 @@ def booking():
       for capacity in airplane:
         result['capacity'] = capacity['capacity']
       result['price'] = price
-      result['seats'] = seats
       seatarr = ['A','B','C','D','E']
       for i in range(result['capacity']//5):
         for x in range(5):
@@ -252,7 +251,6 @@ def modplane():
 
 @app.route('/cancel',methods=['POST'])
 def cancel():
-  app.logger.debug(request.json)
   confirm = request.json[1]
   flightnum = request.json[0]['flightnum']
   takeoff = request.json[0]['takeoff']
@@ -262,6 +260,13 @@ def cancel():
   cursor = g.conn.execute("SELECT * FROM booked_on WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
   app.logger.debug(list(cursor))  
   g.conn.execute("UPDATE flight SET passengers = '{}' WHERE flightnum = '{}' and takeoff = '{}';".format(len(list(cursor)),flightnum,takeoff))
+  return redirect('/manage')
+
+@app.route('/change',methods=['POST'])
+def change():
+  confirm = request.json[0]
+  seat = request.json[1]
+  g.conn.execute("UPDATE booking SET seat = '{}' WHERE confirm = '{}';".format(seat,confirm))
   return redirect('/manage')
 
 @app.route(
@@ -291,6 +296,7 @@ def book():
 def manage():
   if request.method == 'POST':
     flights = []
+    seatarr = ['A','B','C','D','E']
     confirm = request.form['confirm'] 
     ID = request.form['id']
     query = "SELECT * FROM (SELECT flightnum, takeoff FROM (SELECT "
@@ -299,12 +305,28 @@ def manage():
     query+= "'{}') AS e, flight AS f WHERE e.flightnum = f.flightnum AND e.takeoff = f.takeoff;".format(confirm)
     cursor = g.conn.execute(query)
     for result in cursor:
+      seats = []
+      assigned = []
+      remaining = []
       result = result._asdict()
       result['takeoff'] = result['takeoff'].strftime('%Y-%m-%d %H:%M:%S')
       result['landing'] = result['landing'].strftime('%Y-%m-%d %H:%M:%S')
       airplane = g.conn.execute("SELECT capacity FROM airplane WHERE numid = '{}';".format(result['numid']))
       for capacity in airplane:
         result['capacity'] = capacity['capacity']
+      airplane = g.conn.execute("SELECT seat FROM booking WHERE confirm = '{}';".format(confirm))
+      for seat in airplane:
+        result['seat'] = seat['seat']
+      for i in range(result['capacity']//5):
+        for x in range(5):
+          seats.append(str(i+1) + seatarr[x])
+      cursor = g.conn.execute("SELECT seat FROM booking WHERE flightnum = '{}' and takeoff = '{}';".format(result['flightnum'],result['takeoff']))
+      for i in cursor:
+        assigned.append(i._asdict()['seat'])
+      for seat in seats:
+        if seat not in assigned:
+          remaining.append(seat)
+      result['seats'] = remaining
       flights.append(result)
     cursor.close()
     if len(flights) > 0:

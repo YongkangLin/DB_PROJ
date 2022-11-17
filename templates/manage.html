@@ -27,7 +27,6 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
             <script>
                 function cancel(data){
-                    console.log("test")
                     $.ajax({
                         type : "POST",
                         url : '/cancel',
@@ -39,6 +38,26 @@
                         },
                         error: function(request, error){
                             window.alert("Cancel Failed!\n" + 
+                            "Request: " + request + " Error: " + error);
+                        }
+                    })
+                }
+            </script>
+            <script>
+                function change(data){
+                    seats = data[0]['seats']
+                    seat = prompt('Please enter your new seat!\n\nAvailable Seats: ' + seats,'NEW SEAT');
+                    $.ajax({
+                        type : "POST",
+                        url : '/change',
+                        dataType: "text",
+                        data: JSON.stringify([data[1],seat]),
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(){
+                            window.alert("Change Success!\nNew Seat: " + seat)
+                        },
+                        error: function(request, error){
+                            window.alert("Change Failed!\n" + 
                             "Request: " + request + " Error: " + error);
                         }
                     })
@@ -68,6 +87,8 @@
             <th>arrival time</th>
             <th>passengers</th>
             <th>capacity</th>
+            <th>seating</th>
+            <th>change seat?</th>
             <th>cancel booking?</th>
             {% for flight in data[0] %}
                 <tr>
@@ -80,6 +101,8 @@
                     <td>{{flight.landing}}</td>
                     <td>{{flight.passengers}}</td>
                     <td>{{flight.capacity}}</td>
+                    <td>{{flight.seat}}</td>
+                    <td><button type="button" onclick="change({{[flight,data[1]]}})">change this seat</button></td>
                     <td><button type="button" onclick="cancel({{[flight,data[1]]}})">cancel this booking</button></td>
                 </tr>
             </center>
