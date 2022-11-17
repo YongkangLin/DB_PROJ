@@ -100,19 +100,28 @@ def booking():
     cursor = g.conn.execute(query)
     for result in cursor:
       seats = []
+      remaining = []
+      assigned = []
       result = result._asdict()
       price = round(random.uniform(50,500),2)
-
-      for i in range(random.randint(3,10)):
-        seat = str(random.randint(1,30)) + random.choice(['A','B','C','D','E'])
-        seats.append(seat)
       result['takeoff'] = result['takeoff'].strftime('%Y-%m-%d %H:%M:%S')
       result['landing'] = result['landing'].strftime('%Y-%m-%d %H:%M:%S')
-      result['price'] = price
-      result['seats'] = seats
       airplane = g.conn.execute("SELECT capacity FROM airplane WHERE numid = '{}';".format(result['numid']))
       for capacity in airplane:
         result['capacity'] = capacity['capacity']
+      result['price'] = price
+      result['seats'] = seats
+      seatarr = ['A','B','C','D','E']
+      for i in range(result['capacity']//5):
+        for x in range(5):
+          seats.append(str(i+1) + seatarr[x])
+      cursor = g.conn.execute("SELECT seat FROM booking WHERE flightnum = '{}' and takeoff = '{}';".format(result['flightnum'],result['takeoff']))
+      for i in cursor:
+        assigned.append(i._asdict()['seat'])
+      for seat in seats:
+        if seat not in assigned:
+          remaining.append(seat)
+      result['seats'] = remaining
       flights.append(result)
     cursor.close()
     if len(flights) > 0:

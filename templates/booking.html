@@ -73,7 +73,7 @@
                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
                 <script>
                     function book(form,flight){
-                        seats = document.getElementById(flight.flightnum).value
+                        seats = document.getElementById({{flight.flightnum}}).value
                         form.push(seats)
                         $.ajax({
 	                        type : "POST",
@@ -100,7 +100,7 @@
 	                    })
                     };
                 </script>
-                <td><button type="button" onclick="book({{data[0],flight}})">select this flight</button></td>
+                <td><button type="button" onclick="book({{data[0]}},{{flight}})">select this flight</button></td>
             </tr>
         {% endfor %}
     </table>
