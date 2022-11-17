@@ -1,4 +1,5 @@
 import os
+import re
 import sys
 import random
 import string
@@ -36,7 +37,26 @@ def index():
 
 @app.route('/admin')
 def admin():
-  return render_template("admin.html")
+  data = []
+  airport = []
+  airplane = []
+  pilot = []
+  cursor = g.conn.execute("SELECT code FROM airport;")
+  cursor2 = g.conn.execute("SELECT pilotid FROM pilot;")
+  cursor3 = g.conn.execute("SELECT numid FROM airplane;")
+  for i in cursor:
+    i = i._asdict()
+    airport.append(i['code'])
+  for i in cursor2:
+    i = i._asdict()
+    pilot.append(i['pilotid'])
+  for i in cursor3:
+    i = i._asdict()
+    airplane.append(i['numid'])
+  data.append(airport)
+  data.append(airplane)
+  data.append(pilot)
+  return render_template("admin.html",data=data)
 
 @app.route('/booking', methods=['GET','POST'])
 def booking():
@@ -93,12 +113,36 @@ def modairport():
   if request.form['submit'] == 'add':
     g.conn.execute("INSERT INTO airport VALUES('{}','{}','{}');".format(code,city,country))
   if request.form['submit'] == 'delete':
-    g.conn.execute("DELETE FROM airport WHERE code = '{}';".format(code))
+    g.conn.execute("DELETE FROM airport WHERE code ILIKE '{}';".format(code))
+  return redirect('/admin')
+
+@app.route('/modflight',methods=['POST'])
+def modflight():
+  flightnum = request.form['flightnum']
+  depart = request.form['depart']
+  arrival = request.form['arrival']
+  takeoff = request.form['takeoff'].replace('T',' ') + ':00'
+  landing = request.form['landing'].replace('T',' ') + ':00'
+  app.logger.debug(takeoff)
+  plane = request.form['numid']
+  pilot = request.form['pilot']
+  if request.form['submit'] == 'add':
+    q = "INSERT INTO flight VALUES('{}','{}','{}',".format(flightnum,takeoff,landing)
+    q += "'0','{}','{}','{}');".format(depart,arrival,plane)
+    g.conn.execute(q)
+    g.conn.execute("INSERT INTO departs_from VALUES('{}','{}','{}');".format(flightnum,takeoff,depart))
+    g.conn.execute("INSERT INTO lands_in VALUES('{}','{}','{}');".format(flightnum,takeoff,arrival))
+    g.conn.execute("INSERT INTO flown_by VALUES('{}','{}','{}');".format(pilot,flightnum,takeoff))
+    g.conn.execute("INSERT INTO assigned_to VALUES('{}','{}','{}');".format(plane,flightnum,takeoff))
+  if request.form['submit'] == 'delete':
+    g.conn.execute("DELETE FROM flight WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
+    g.conn.execute("DELETE FROM lands_in WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
+    g.conn.execute("DELETE FROM departs_from WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
+    g.conn.execute("DELETE FROM assigned_to WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))
   return redirect('/admin')
 
 @app.route('/modpilot',methods=['POST'])
 def modpilot():
-  app.logger.debug(request.form)
   pilotid = request.form['id']
   name = request.form['name']
   fhours = request.form['hours']
@@ -106,7 +150,22 @@ def modpilot():
   if request.form['submit'] == 'add':
     g.conn.execute("INSERT INTO pilot VALUES('{}','{}','{}','{}');".format(pilotid,name,fhours,rank))
   if request.form['submit'] == 'delete':
-    g.conn.execute("DELETE FROM pilot WHERE pilotid = '{}';".format(pilotid))
+    g.conn.execute("DELETE FROM pilot WHERE pilotid ILIKE '{}';".format(pilotid))
+  return redirect('/admin')
+
+@app.route('/modplane',methods=['POST'])
+def modplane():
+  numid = request.form['numid']
+  manufacturer = request.form['manufacturer']
+  model = request.form['model']
+  fleet = request.form['fleet']
+  capacity = request.form['capacity']
+  if request.form['submit'] == 'add':
+    query = ("INSERT INTO airplane VALUES(" + 
+    "'{}','{}','{}','{}','{}');".format(numid,manufacturer,model,fleet,capacity))
+    g.conn.execute(query)
+  if request.form['submit'] == 'delete':
+    g.conn.execute("DELETE FROM airplane WHERE numid ILIKE '{}';".format(numid))
   return redirect('/admin')
 
 @app.route(

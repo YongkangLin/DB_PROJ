@@ -1,5 +1,14 @@
 <html>
     <style>
+        header{
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 100px;
+            border: 10px solid black;
+            background-color: blueviolet;
+        }
+        body {
+            background-image: url('https://media-exp1.licdn.com/dms/image/C4D03AQF5VmMKj1cNew/profile-displayphoto-shrink_800_800/0/1641000291837?e=2147483647&v=beta&t=eFeZmLngMNIoM5OgXddTZsmlASH_CgZOcLvkT12J4Is');
+        }
         .boxed{
             width: 300px;
             height: 105px;
@@ -12,28 +21,102 @@
             border: 3px solid black;
             background-color: rgb(200, 255, 250);
         }
+        .boxed3{
+            width: 300px;
+            height: 147px;
+            border: 3px solid black;
+            background-color: rgb(200, 255, 250);
+        }
+        .boxed4{
+            width: 300px;
+            height: 190px;
+            border: 3px solid black;
+            background-color: rgb(200, 255, 250);
+        }
     </style>
+    <header>
+        ADMIN PAGE!!!
+    </header>
+    <br>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <div class="boxed">
-        Modify Airport Database
+        &nbsp;Modify Airport Database
         <form id = "airport" action="/modairport" method="post">
-            Airport Code:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="code"><br>
-            Airport City:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="city"><br>
-            Airport Country: <input type="text" name="country"><br>
-            <input type="submit" name="submit" value="add">
-            <input type="submit" name="submit" value="delete">
+            &nbsp;Airport Code:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="code"><br>
+            &nbsp;Airport City:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="city"><br>
+            &nbsp;Airport Country: <input type="text" name="country"><br>
+            &nbsp;<input type="submit" name="submit" value="add">
+            &nbsp;<input type="submit" name="submit" value="delete">
         </form>
     </div>
     <br>
     <div class="boxed2">
-        Modify Pilot Database
+        &nbsp;Modify Pilot Database
         <form id="pilot" action="/modpilot" method="post">
-            Pilot ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="id"><br>
-            Pilot Name:&nbsp;&nbsp;&nbsp;<input type="text" name="name"><br>
-            Pilot Rank:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="rank"><br>
-            Flight Hours: <input type="text" name="hours"><br>
-            <input type="submit" name="submit" value="add">
-            <input type="submit" name="submit" value="delete">
+            &nbsp;Pilot ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="id"><br>
+            &nbsp;Pilot Name:&nbsp;&nbsp;&nbsp;<input type="text" name="name"><br>
+            &nbsp;Pilot Rank:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="rank"><br>
+            &nbsp;Flight Hours: <input type="text" name="hours"><br>
+            &nbsp;<input type="submit" name="submit" value="add">
+            &nbsp;<input type="submit" name="submit" value="delete">
+        </form>
+    </div>
+    <br>
+    <div class="boxed3">
+        &nbsp;Modify Airplane Database
+        <form id="plane" action="/modplane" method="post">
+            &nbsp;NumID: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;<input type="text" name="numid"><br>
+            &nbsp;Manufacturer: <input type="text" name="manufacturer"><br>
+            &nbsp;Model:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="model"><br>
+            &nbsp;Fleet:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="fleet"><br>
+            &nbsp;Capacity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;<input type="text" name="capacity"><br>
+            &nbsp;<input type="submit" name="submit" value="add">
+            &nbsp;<input type="submit" name="submit" value="delete">
+        </form>
+    </div>
+    <br>
+    <div class="boxed4">
+        &nbsp;Modify Flights Database
+        <form id="flight" action="/modflight" method="post">
+            &nbsp;Flight Num:&nbsp;&nbsp;&nbsp;<input type="number" name="flightnum"><br>
+            &nbsp;Takeoff:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;<input type="datetime-local" name="takeoff"><br>
+            &nbsp;landing:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            &nbsp;&nbsp;&nbsp;&nbsp;<input type="datetime-local" name="landing"><br>
+            &nbsp;Depart Code:                
+                <select name = "depart" id="depart">
+                    {% for airport in data[0] %}
+                        <option id = "airport" value="{{airport}}" SELECTED>{{airport}}</option>
+                    {% endfor %} 
+                </select>
+            <br>
+            &nbsp;Arrival Code:                
+                <select name = "arrival" id="arrival">
+                    {% for airport in data[0] %}
+                        <option id = "airport" value="{{airport}}" SELECTED>{{airport}}</option>
+                    {% endfor %} 
+                </select>
+            <br>
+            &nbsp;Plane ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <select name = "numid" id="numid">
+                    {% for airplane in data[1] %}
+                        <option id = "airplane" value="{{airplane}}" SELECTED>{{airplane}}</option>
+                    {% endfor %} 
+                </select>
+            <br>
+            &nbsp;Pilot ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <select id="pilot" name = "pilot">
+                    {% for Pilot in data[2] %}
+                        <option id = "Pilot" value="{{Pilot}}" SELECTED>{{Pilot}}</option>
+                    {% endfor %} 
+                </select>
+            <br>
+            &nbsp;<input type="submit" name="submit" value="add">
+            &nbsp;<input type="submit" name="submit" value="delete">
         </form>
     </div>
     <script>
@@ -54,6 +137,31 @@
             var x = ("Pilot database modified:\nPilot ID: "+data[0].value+ "\n" +
             "Pilot Name: "+data[1].value + "\n" + "Pilot Rank: " + data[2].value
             + "\n" + "Flight Hours: " + data[3].value)
+            window.alert(x)
+        }
+    </script>
+        <script>
+            plane = document.getElementById("plane");
+            plane.addEventListener('submit', planef);
+            function planef(event) {
+                var data = $("#plane").serializeArray();
+                var x = ("Airplane database modified:\n NumID: "+data[0].value+
+                "\nManufacturer: "+data[1].value + "\nModel: " + data[2].value
+                + "\nFleet: " + data[3].value + "\nCapacity" + data[4].value)
+                window.alert(x)
+            }
+    </script>
+    <script>
+        flight = document.getElementById("flight");
+        flight.addEventListener('submit', flightf);
+        takeoff = document.getElementById("takeoff").value
+        console.log(takeoff)
+        function flightf(event) {
+            var data = $("#flight").serializeArray();
+            var x = ("Flight database modified:\nFlight Num: "+data[0].value+
+            "\nTakeoff: "+data[1].value + "\nLanding: " + data[2].value
+            + "\nDepart: " + data[3].value + "\nArrival: " + data[4].value
+            + "\nPlane ID: " + data[5].value+ "\nPilot ID: " + data[6].value)
             window.alert(x)
         }
     </script>
