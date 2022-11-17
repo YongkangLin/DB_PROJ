@@ -151,8 +151,15 @@ def modairport():
   country = request.form['country']
   if request.form['submit'] == 'add':
     g.conn.execute("INSERT INTO airport VALUES('{}','{}','{}');".format(code,city,country))
+    
   if request.form['submit'] == 'delete':
-    g.conn.execute("DELETE FROM airport WHERE code ILIKE '{}';".format(code))
+    cursor =  g.conn.execute("SELECT flightnum, takeoff FROM flight WHERE arrivalcode = '{}' OR departcode = '{}';".format(code,code))
+    for row in cursor:
+      row = row._asdict()
+      g.conn.execute("DELETE FROM departs_from WHERE flightnum = {} AND takeoff = '{}';".format(row['flightnum'], row['takeoff']))
+      g.conn.execute("DELETE FROM lands_in WHERE flightnum = {} AND takeoff = '{}';".format(row['flightnum'], row['takeoff']))
+    g.conn.execute("DELETE FROM flight WHERE departcode = '{}' OR arrivalcode = '{}';".format(code, code))
+    g.conn.execute("DELETE FROM airport WHERE code = '{}';".format(code))
   return redirect('/admin')
 
 @app.route('/modflight',methods=['POST'])
@@ -190,7 +197,8 @@ def modpilot():
   if request.form['submit'] == 'add':
     g.conn.execute("INSERT INTO pilot VALUES('{}','{}','{}','{}');".format(pilotid,name,fhours,rank))
   if request.form['submit'] == 'delete':
-    g.conn.execute("DELETE FROM pilot WHERE pilotid ILIKE '{}';".format(pilotid))
+    g.conn.execute("DELETE FROM flown_by WHERE pilotid = '{}';".format(pilotid))
+    g.conn.execute("DELETE FROM pilot WHERE pilotid = '{}';".format(pilotid))
   return redirect('/admin')
 
 @app.route('/modplane',methods=['POST'])
@@ -205,7 +213,17 @@ def modplane():
     "'{}','{}','{}','{}','{}');".format(numid,manufacturer,model,fleet,capacity))
     g.conn.execute(query)
   if request.form['submit'] == 'delete':
-    g.conn.execute("DELETE FROM airplane WHERE numid ILIKE '{}';".format(numid))
+    """
+    cursor =  g.conn.execute("SELECT flightnum, takeoff FROM flight WHERE numid = '{}';".format(numid))
+    for row in cursor:
+      row = row._asdict()
+      g.conn.execute("DELETE FROM booked_on WHERE flightnum = '{}' AND takeoff = '{}';".format(row['flightnum'], row['takeoff']))
+      g.conn.execute("DELETE FROM booking WHERE flightnum = '{}' AND takeoff = '{}';".format(row['flightnum'], row['takeoff']))
+      g.conn.execute("DELETE FROM assigned_to WHERE flightnum = '{}';".format(row['flightnum']))
+    g.conn.execute("DELETE FROM flight WHERE numid = '{}';".format(numid))  
+    """
+    g.conn.execute("DELETE FROM airplane WHERE numid = '{}';".format(numid))
+
   return redirect('/admin')
 
 @app.route('/cancel',methods=['POST'])
