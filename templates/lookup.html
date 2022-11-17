@@ -1,0 +1,51 @@
+<html>
+    <style>
+        header{
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 50px;
+        }
+        body{
+            background-color:rgb(240, 212, 152);
+        }
+        th{
+            border: 2px solid black;
+            background-color: rgb(255, 255, 255)
+        }
+        tbody tr:nth-child(even) td{
+            background-color: #89ABE3FF;
+        }
+        tbody tr:nth-child(odd) td{
+            background-color: #EA738DFF;
+        }
+    </style>
+    <header>
+        LOOK UP FLIGHTS HERE!
+    </header>
+    <br>
+    <form id = "form" method="POST" action="/lookup">
+        <select name = "lookup" id="lookup">
+            {% for lookup in data[0] %}
+                <option id = "lookup" value="{{lookup}}" SELECTED>{{lookup}}</option>
+            {% endfor %}
+            <input type="text" name="key" /> 
+            <input type="submit" name="submit" value="submit"/> 
+        </select>
+    </form>
+    <br>
+    <table>
+        <th>flight number</th>
+        <th>departure</th>
+        <th>arrival</th>
+        <th>depart time</th>
+        <th>arrival time</th>
+        {% for flight in data[1] %}
+            <tr>
+                <td>{{flight.flightnum}}</td>
+                <td>{{flight.departcode}}</td>
+                <td>{{flight.arrivalcode}}</td>
+                <td>{{flight.takeoff}}</td>
+                <td>{{flight.landing}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</html>

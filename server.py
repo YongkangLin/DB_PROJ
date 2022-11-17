@@ -121,6 +121,29 @@ def booking():
       return render_template("booking.html", data=[])
   return render_template("booking.html", data=[])
 
+@app.route('/lookup',methods=['GET','POST'])
+def lookup():
+  column = ['FlightNum', 'Takeoff', 'Landing', 'DepartCode', 'ArrivalCode']
+  if request.method == 'POST':
+    results = []
+    lookup = request.form['lookup']
+    key = request.form['key']
+    if lookup == "FlightNum" or lookup == 'Takeoff' or lookup == 'Landing':
+      cursor = g.conn.execute("SELECT * FROM flight WHERE {} = '{}';".format(lookup,key))
+      for i in cursor:
+        results.append(i)
+      cursor.close()
+    elif lookup == 'DepartCode' or lookup == 'ArrivalCode':
+      cursor = g.conn.execute("SELECT * FROM flight WHERE {} ILIKE '{}';".format(lookup,key))
+      for i in cursor:
+        results.append(i)
+      cursor.close() 
+    if len(results) > 0:
+      return render_template("lookup.html", data=[column,results])
+    else:
+      return render_template("lookup.html", data=[column])
+  return render_template("lookup.html", data=[column])
+
 @app.route('/modairport',methods=['POST'])
 def modairport():
   code = request.form['code']
@@ -214,7 +237,6 @@ def book():
   cursor = g.conn.execute("SELECT * FROM booked_on WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))  
   g.conn.execute("UPDATE flight SET passengers = '{}' WHERE flightnum = '{}' and takeoff = '{}';".format(len(list(cursor)),flightnum,takeoff))
   return redirect('/booking')
-
 
 @app.route('/manage', methods=['GET','POST'])
 def manage():
