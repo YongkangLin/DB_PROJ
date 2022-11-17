@@ -137,10 +137,13 @@ def lookup():
     lookup = request.form['lookup']
     key = request.form['key']
     if lookup == "FlightNum" or lookup == 'Takeoff' or lookup == 'Landing':
-      cursor = g.conn.execute("SELECT * FROM flight WHERE {} = '{}';".format(lookup,key))
-      for i in cursor:
-        results.append(i)
-      cursor.close()
+      try:
+        cursor = g.conn.execute("SELECT * FROM flight WHERE {} = '{}';".format(lookup,key))
+        for i in cursor:
+          results.append(i)
+        cursor.close()
+      except:
+        None
     elif lookup == 'DepartCode' or lookup == 'ArrivalCode':
       cursor = g.conn.execute("SELECT * FROM flight WHERE {} ILIKE '{}';".format(lookup,key))
       for i in cursor:
