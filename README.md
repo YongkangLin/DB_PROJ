@@ -2,7 +2,7 @@
 
 PostgreSQL Account: aea2185
 
-URL: http://34.148.138.206:8111/booking
+URL: http://34.148.138.206:8111/
 
 Description of Implementation:
 
