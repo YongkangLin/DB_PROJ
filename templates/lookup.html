@@ -27,7 +27,7 @@
             {% for lookup in data[0] %}
                 <option id = "lookup" value="{{lookup}}" SELECTED>{{lookup}}</option>
             {% endfor %}
-            <input type="text" name="key" /> 
+            <input type="text" name="key" required/> 
             <input type="submit" name="submit" value="submit"/> 
         </select>
     </form>

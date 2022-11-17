@@ -209,10 +209,15 @@ def modplane():
 
 @app.route('/cancel',methods=['POST'])
 def cancel():
-  confirm = request.json[0][0]
+  app.logger.debug(request.json)
+  confirm = request.json[0][1]
+  flightnum = request.json[0][0]['flightnum']
+  takeoff = request.json[0][0]['takeoff']
   g.conn.execute("DELETE FROM booked_by WHERE confirm ILIKE '{}';".format(confirm))
   g.conn.execute("DELETE FROM booked_on WHERE confirm ILIKE '{}';".format(confirm))
   g.conn.execute("DELETE FROM booking WHERE confirm ILIKE '{}';".format(confirm))
+  cursor = g.conn.execute("SELECT * FROM booked_on WHERE flightnum = '{}' and takeoff = '{}';".format(flightnum,takeoff))  
+  g.conn.execute("UPDATE flight SET passengers = '{}' WHERE flightnum = '{}' and takeoff = '{}';".format(len(list(cursor)),flightnum,takeoff))
   return redirect('/manage')
 
 @app.route(
@@ -251,6 +256,8 @@ def manage():
     cursor = g.conn.execute(query)
     for result in cursor:
       result = result._asdict()
+      result['takeoff'] = result['takeoff'].strftime('%Y-%m-%d %H:%M:%S')
+      result['landing'] = result['landing'].strftime('%Y-%m-%d %H:%M:%S')
       airplane = g.conn.execute("SELECT capacity FROM airplane WHERE numid = '{}';".format(result['numid']))
       for capacity in airplane:
         result['capacity'] = capacity['capacity']

@@ -25,13 +25,13 @@
     </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
             <script>
-                function cancel(confirm){
+                function cancel(flight,confirm){
                     console.log("test")
                     $.ajax({
                         type : "POST",
                         url : '/cancel',
                         dataType: "text",
-                        data: JSON.stringify([confirm]),
+                        data: JSON.stringify([flight,confirm]),
                         contentType: 'application/json;charset=UTF-8',
                         success: function(){
                             window.alert("Cancel success!\nConfirmation Code: " + confirm)
@@ -74,7 +74,7 @@
                     <td>{{flight.capacity}}</td>
                     <td>{{flight.takeoff}}</td>
                     <td>{{flight.landing}}</td>
-                    <td><button type="button" onclick="cancel({{[data[1]]}})">cancel this booking</button></td>
+                    <td><button type="button" onclick="cancel({{[flight,data[1]]}})">cancel this booking</button></td>
                 </tr>
             {% endfor %}
         </table>
