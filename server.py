@@ -214,8 +214,8 @@ def modpilot():
     g.conn.execute("DELETE FROM lands_in WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM flown_by WHERE pilotid = '{}');".format(pilotid))
     g.conn.execute("DELETE FROM assigned_to WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM flown_by WHERE pilotid = '{}');".format(pilotid))
     g.conn.execute("DELETE FROM flown_by WHERE pilotid = '{}';".format(pilotid))
-    g.conn.execute("DELETE FROM pilot WHERE pilotid = '{}';".format(pilotid))
     g.conn.execute("DELETE FROM flight WHERE pilotid = '{}';".format(pilotid))
+    g.conn.execute("DELETE FROM pilot WHERE pilotid = '{}';".format(pilotid))
   return redirect('/admin')
 
 @app.route('/modplane',methods=['POST'])
