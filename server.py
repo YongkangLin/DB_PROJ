@@ -19,8 +19,8 @@ engine = create_engine(DATABASEURI)
 logging.basicConfig(level=logging.DEBUG)
 
 users = {
-    "yong": generate_password_hash("pog"),
-    "antonio": generate_password_hash("mid")
+    "Yong": generate_password_hash("pog"),
+    "Antonio": generate_password_hash("mid")
 }
 
 @auth.verify_password
@@ -71,6 +71,7 @@ def admin():
   data.append(airport)
   data.append(airplane)
   data.append(pilot)
+  data.append(auth.current_user())
   return render_template("admin.html",data=data)
 
 @app.route('/booking', methods=['GET','POST'])
@@ -183,11 +184,18 @@ def modplane():
     g.conn.execute("DELETE FROM airplane WHERE numid ILIKE '{}';".format(numid))
   return redirect('/admin')
 
+@app.route('/cancel',methods=['POST'])
+def cancel():
+  confirm = request.json[0][0]
+  g.conn.execute("DELETE FROM booked_by WHERE confirm ILIKE '{}';".format(confirm))
+  g.conn.execute("DELETE FROM booked_on WHERE confirm ILIKE '{}';".format(confirm))
+  g.conn.execute("DELETE FROM booking WHERE confirm ILIKE '{}';".format(confirm))
+  return redirect('/manage')
+
 @app.route(
   '/book', methods=['POST'])
 def book():
   content = request.json
-  app.logger.debug(content)
   pid = content[0][0]
   name = content[0][1]
   bday = content[0][2]
@@ -208,22 +216,29 @@ def book():
   return redirect('/booking')
 
 
-@app.route('/lookup', methods=['GET','POST'])
-def lookup():
+@app.route('/manage', methods=['GET','POST'])
+def manage():
   if request.method == 'POST':
     flights = []
     confirm = request.form['confirm'] 
-    query = ("SELECT * FROM flight as f, (SELECT flightnum FROM booked_on " + 
-    "WHERE confirm = '{}') as s WHERE f.flightnum = s.flightnum;".format(confirm))
+    ID = request.form['id']
+    query = "select * from (select flightnum, takeoff from (select "
+    query+= "confirm from booked_by as b,(select pid from passenger where idnum = '{}') as a where".format(ID)
+    query += " b.pid = a.pid) as c, booked_on as d where c.confirm = d.confirm and d.confirm = "
+    query+= "'{}') as e, flight as f where e.flightnum = f.flightnum and e.takeoff = f.takeoff;".format(confirm)
     cursor = g.conn.execute(query)
     for result in cursor:
+      result = result._asdict()
+      airplane = g.conn.execute("SELECT capacity FROM airplane WHERE numid = '{}';".format(result['numid']))
+      for capacity in airplane:
+        result['capacity'] = capacity['capacity']
       flights.append(result)
     cursor.close()
     if len(flights) > 0:
-      return render_template("lookup.html", data=[flights])
+      return render_template("manage.html", data=[flights,confirm])
     else:
-      return render_template("lookup.html", data=[])
-  return render_template("lookup.html", data=[])
+      return render_template("manage.html", data=[])
+  return render_template("manage.html", data=[])
 
 if __name__ == "__main__":
   import click

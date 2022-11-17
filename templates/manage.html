@@ -1,0 +1,86 @@
+<html>
+    <style>
+        header{
+            font-size: 30pt;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        body{ 
+          font-size: 15pt;
+          font-family: sans-serif;
+          background-color:rgb(230, 200, 136);
+        }
+        th{
+            border: 2px solid black;
+            background-color: rgb(255, 255, 255)
+        }
+        tbody tr:nth-child(even) td{
+            background-color: #89ABE3FF;
+        }
+        tbody tr:nth-child(odd) td{
+            background-color: #EA738DFF;
+        }
+
+        thead tr th { background-color: rgb(255, 255, 255)}
+
+    </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <script>
+                function cancel(confirm){
+                    console.log("test")
+                    $.ajax({
+                        type : "POST",
+                        url : '/cancel',
+                        dataType: "text",
+                        data: JSON.stringify([confirm]),
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(){
+                            window.alert("Cancel success!\nConfirmation Code: " + confirm)
+                        },
+                        error: function(request, error){
+                            window.alert("Cancel Failed!\n" + 
+                            "Request: " + request + " Error: " + error);
+                        }
+                    })
+                }
+            </script>
+    <header>
+        <center>MANAGE YOUR BOOKING!!!</center>
+    </header>
+    <body>
+        <center>
+        <form method="POST" action="/manage">
+        <p>Enter your confirmation number: 
+            <input type="text" name="confirm" required> <br>
+            Enter your ID number:
+            <input type="text" name="id" required> <br><br>
+            <input type="submit" value="look up"></p>
+        </form>
+        </center>
+        <table>
+            <th>flight number</th>
+            <th>departure</th>
+            <th>arrival</th>
+            <th>plane passenger</th>
+            <th>plane capacity</th>
+            <th>depart time</th>
+            <th>arrival time</th>
+            <th>cancel booking?</th>
+            {% for flight in data[0] %}
+                <tr>
+                    <td>{{flight.flightnum}}</td>
+                    <td>{{flight.departcode}}</td>
+                    <td>{{flight.arrivalcode}}</td>
+                    <td>{{flight.passengers}}</td>
+                    <td>{{flight.capacity}}</td>
+                    <td>{{flight.takeoff}}</td>
+                    <td>{{flight.landing}}</td>
+                    <td><button type="button" onclick="cancel({{[data[1]]}})">cancel this booking</button></td>
+                </tr>
+            {% endfor %}
+        </table>
+        <img style="width:230px;height:250px;" src = 'https://i.scdn.co/image/ab67616d0000b273040c7bb8b15c215a354e6f53'>
+        <img style="width:230px;height:250px;" src = 'https://i.scdn.co/image/ab67616d0000b273040c7bb8b15c215a354e6f53'>
+        <img style="width:230px;height:250px;" src = 'https://i.scdn.co/image/ab67616d0000b273040c7bb8b15c215a354e6f53'>
+        <img style="width:230px;height:250px;" src = 'https://i.scdn.co/image/ab67616d0000b273040c7bb8b15c215a354e6f53'>
+    </body>
+</html>
