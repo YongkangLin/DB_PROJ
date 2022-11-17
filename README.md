@@ -8,6 +8,8 @@ Description of Implementation:
 
 We were able to successfully implement the lookup and booking flight component from our original plan. We also implemented a manage functionality and admin functionality. In admin, we streamlined adding/deleting database entries such as airport, flight, pilot, and airplanes. Adding/Deleting data through admin page will automatically add/delete data in other tables that references it. Our manage page is where passengers can lookup their flight's information with their confirmation number and ID. From there, we allow passengers to modify their flight, that is, cancel it or change seats. We did not have time to separate flights into one-way or round-trip flights. We also opted to hard code flight data into our site, instead of fetching real-time data, to minimize the complexity of our implementation.
 
+*Note: design choices in /admin and /manage included security concerns. Admin is only accessible with user:pass, and booking is only modifiable if the person knows the relevant govt ID # associated with it.
+
 
 Description of Two Webpages:
 
