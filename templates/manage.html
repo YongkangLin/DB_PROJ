@@ -64,6 +64,8 @@
             <th>plane capacity</th>
             <th>depart time</th>
             <th>arrival time</th>
+            <th>passengers</th>
+            <th>capacity</th>
             <th>cancel booking?</th>
             {% for flight in data[0] %}
                 <tr>
@@ -74,6 +76,8 @@
                     <td>{{flight.capacity}}</td>
                     <td>{{flight.takeoff}}</td>
                     <td>{{flight.landing}}</td>
+                    <td>{{flight.passengers}}</td>
+                    <td>{{flight.capacity}}</td>
                     <td><button type="button" onclick="cancel({{[flight,data[1]]}})">cancel this booking</button></td>
                 </tr>
             {% endfor %}

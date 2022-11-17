@@ -153,13 +153,23 @@ def modairport():
     g.conn.execute("INSERT INTO airport VALUES('{}','{}','{}');".format(code,city,country))
     
   if request.form['submit'] == 'delete':
-    cursor =  g.conn.execute("SELECT flightnum, takeoff FROM flight WHERE arrivalcode = '{}' OR departcode = '{}';".format(code,code))
-    for row in cursor:
-      row = row._asdict()
-      g.conn.execute("DELETE FROM departs_from WHERE flightnum = {} AND takeoff = '{}';".format(row['flightnum'], row['takeoff']))
-      g.conn.execute("DELETE FROM lands_in WHERE flightnum = {} AND takeoff = '{}';".format(row['flightnum'], row['takeoff']))
-    g.conn.execute("DELETE FROM flight WHERE departcode = '{}' OR arrivalcode = '{}';".format(code, code))
-    g.conn.execute("DELETE FROM airport WHERE code = '{}';".format(code))
+    g.conn.execute("DELETE FROM booked_on WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM departs_from WHERE code ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM booked_on WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM lands_in WHERE code ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM booked_by WHERE confirm IN (SELECT confirm FROM booking WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM departs_from WHERE code ILIKE '{}'));".format(code))
+    g.conn.execute("DELETE FROM booked_by WHERE confirm IN (SELECT confirm FROM booking WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM lands_in WHERE code ILIKE '{}'));".format(code))
+    g.conn.execute("DELETE FROM booking WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM departs_from WHERE code ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM booking WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM lands_in WHERE code ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM flown_by WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM departs_from WHERE code ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM flown_by WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM lands_in WHERE code ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM assigned_to WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM departs_from WHERE code ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM assigned_to WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM lands_in WHERE code ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM departs_from WHERE (flightnum,takeoff) IN (SELECT flightnum,takeoff FROM flight WHERE departcode ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM departs_from WHERE (flightnum,takeoff) IN (SELECT flightnum,takeoff FROM flight WHERE arrivalcode ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM lands_in WHERE (flightnum,takeoff) IN (SELECT flightnum,takeoff FROM flight WHERE departcode ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM lands_in WHERE (flightnum,takeoff) IN (SELECT flightnum,takeoff FROM flight WHERE arrivalcode ILIKE '{}');".format(code))
+    g.conn.execute("DELETE FROM flight WHERE arrivalcode ILIKE '{}';".format(code))
+    g.conn.execute("DELETE FROM flight WHERE departcode ILIKE '{}';".format(code))
+    g.conn.execute("DELETE FROM airport WHERE code ILIKE '{}';".format(code))
   return redirect('/admin')
 
 @app.route('/modflight',methods=['POST'])
@@ -174,7 +184,7 @@ def modflight():
   pilot = request.form['pilot']
   if request.form['submit'] == 'add':
     q = "INSERT INTO flight VALUES('{}','{}','{}',".format(flightnum,takeoff,landing)
-    q += "'0','{}','{}','{}');".format(depart,arrival,plane)
+    q += "'0','{}','{}','{}','{}');".format(depart,arrival,plane,pilot)
     g.conn.execute(q)
     g.conn.execute("INSERT INTO departs_from VALUES('{}','{}','{}');".format(flightnum,takeoff,depart))
     g.conn.execute("INSERT INTO lands_in VALUES('{}','{}','{}');".format(flightnum,takeoff,arrival))
@@ -197,8 +207,15 @@ def modpilot():
   if request.form['submit'] == 'add':
     g.conn.execute("INSERT INTO pilot VALUES('{}','{}','{}','{}');".format(pilotid,name,fhours,rank))
   if request.form['submit'] == 'delete':
+    g.conn.execute("DELETE FROM booked_on WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM flown_by WHERE pilotid = '{}');".format(pilotid))
+    g.conn.execute("DELETE FROM booked_by WHERE confirm IN (SELECT confirm FROM booking WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM flown_by WHERE pilotid = '{}'));".format(pilotid))
+    g.conn.execute("DELETE FROM booking WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM flown_by WHERE pilotid = '{}');".format(pilotid))
+    g.conn.execute("DELETE FROM departs_from WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM flown_by WHERE pilotid = '{}');".format(pilotid))
+    g.conn.execute("DELETE FROM lands_in WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM flown_by WHERE pilotid = '{}');".format(pilotid))
+    g.conn.execute("DELETE FROM assigned_to WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM flown_by WHERE pilotid = '{}');".format(pilotid))
     g.conn.execute("DELETE FROM flown_by WHERE pilotid = '{}';".format(pilotid))
     g.conn.execute("DELETE FROM pilot WHERE pilotid = '{}';".format(pilotid))
+    g.conn.execute("DELETE FROM flight WHERE pilotid = '{}';".format(pilotid))
   return redirect('/admin')
 
 @app.route('/modplane',methods=['POST'])
@@ -213,17 +230,15 @@ def modplane():
     "'{}','{}','{}','{}','{}');".format(numid,manufacturer,model,fleet,capacity))
     g.conn.execute(query)
   if request.form['submit'] == 'delete':
-    """
-    cursor =  g.conn.execute("SELECT flightnum, takeoff FROM flight WHERE numid = '{}';".format(numid))
-    for row in cursor:
-      row = row._asdict()
-      g.conn.execute("DELETE FROM booked_on WHERE flightnum = '{}' AND takeoff = '{}';".format(row['flightnum'], row['takeoff']))
-      g.conn.execute("DELETE FROM booking WHERE flightnum = '{}' AND takeoff = '{}';".format(row['flightnum'], row['takeoff']))
-      g.conn.execute("DELETE FROM assigned_to WHERE flightnum = '{}';".format(row['flightnum']))
-    g.conn.execute("DELETE FROM flight WHERE numid = '{}';".format(numid))  
-    """
+    g.conn.execute("DELETE FROM booked_on WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM assigned_to WHERE numid = '{}');".format(numid))
+    g.conn.execute("DELETE FROM booked_by WHERE confirm IN (SELECT confirm FROM booking WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM assigned_to WHERE numid = '{}'));".format(numid))
+    g.conn.execute("DELETE FROM booking WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM assigned_to WHERE numid = '{}');".format(numid))
+    g.conn.execute("DELETE FROM departs_from WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM assigned_to WHERE numid = '{}');".format(numid))
+    g.conn.execute("DELETE FROM lands_in WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM assigned_to WHERE numid = '{}');".format(numid))
+    g.conn.execute("DELETE FROM flown_by WHERE (flightnum,takeoff) IN (SELECT flightnum, takeoff FROM assigned_to WHERE numid = '{}');".format(numid))
+    g.conn.execute("DELETE FROM assigned_to WHERE numid = '{}';".format(numid))
+    g.conn.execute("DELETE FROM flight WHERE numid = '{}';".format(numid))
     g.conn.execute("DELETE FROM airplane WHERE numid = '{}';".format(numid))
-
   return redirect('/admin')
 
 @app.route('/cancel',methods=['POST'])
@@ -269,10 +284,10 @@ def manage():
     flights = []
     confirm = request.form['confirm'] 
     ID = request.form['id']
-    query = "select * from (select flightnum, takeoff from (select "
-    query+= "confirm from booked_by as b,(select pid from passenger where idnum = '{}') as a where".format(ID)
-    query += " b.pid = a.pid) as c, booked_on as d where c.confirm = d.confirm and d.confirm = "
-    query+= "'{}') as e, flight as f where e.flightnum = f.flightnum and e.takeoff = f.takeoff;".format(confirm)
+    query = "SELECT * FROM (SELECT flightnum, takeoff FROM (SELECT "
+    query+= "confirm FROM booked_by AS b,(SELECT pid FROM passenger WHERE idnum = '{}') AS a WHERE".format(ID)
+    query += " b.pid = a.pid) AS c, booked_on AS d WHERE c.confirm = d.confirm AND d.confirm = "
+    query+= "'{}') AS e, flight AS f WHERE e.flightnum = f.flightnum AND e.takeoff = f.takeoff;".format(confirm)
     cursor = g.conn.execute(query)
     for result in cursor:
       result = result._asdict()

@@ -51,9 +51,9 @@
     <div class="boxed">
         &nbsp;Modify Airport Database
         <form id = "airport" action="/modairport" method="post">
-            &nbsp;Airport Code:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input maxlength = "3" type="text" name="code"><br>
-            &nbsp;Airport City:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="city"><br>
-            &nbsp;Airport Country: <input type="text" name="country"><br>
+            &nbsp;Airport Code:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input required maxlength = "3" type="text" name="code"><br>
+            &nbsp;Airport City:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input  type="text" name="city"><br>
+            &nbsp;Airport Country: <input  type="text" name="country"><br>
             &nbsp;<input type="submit" name="submit" value="add">
             &nbsp;<input type="submit" name="submit" value="delete">
         </form>
@@ -62,10 +62,10 @@
     <div class="boxed2">
         &nbsp;Modify Pilot Database
         <form id="pilot" action="/modpilot" method="post">
-            &nbsp;Pilot ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input maxlength = "7" type="text" name="id"><br>
-            &nbsp;Pilot Name:&nbsp;&nbsp;&nbsp;<input type="text" name="name"><br>
-            &nbsp;Pilot Rank:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="rank"><br>
-            &nbsp;Flight Hours: <input type="number" name="hours"><br>
+            &nbsp;Pilot ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input required maxlength = "7" type="text" name="id"><br>
+            &nbsp;Pilot Name:&nbsp;&nbsp;&nbsp;<input  type="text" name="name"><br>
+            &nbsp;Pilot Rank:&nbsp;&nbsp;&nbsp;&nbsp;<input  type="text" name="rank"><br>
+            &nbsp;Flight Hours: <input  type="number" name="hours"><br>
             &nbsp;<input type="submit" name="submit" value="add">
             &nbsp;<input type="submit" name="submit" value="delete">
         </form>
@@ -75,14 +75,14 @@
         &nbsp;Modify Airplane Database
         <form id="plane" action="/modplane" method="post">
             &nbsp;NumID: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;<input maxlength = "6" type="text" name="numid"><br>
-            &nbsp;Manufacturer: <input type="text" name="manufacturer"><br>
+            &nbsp;&nbsp;<input required maxlength = "6" type="text" name="numid"><br>
+            &nbsp;Manufacturer: <input  type="text" name="manufacturer"><br>
             &nbsp;Model:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="model"><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<input  type="text" name="model"><br>
             &nbsp;Fleet:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="fleet"><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input  type="text" name="fleet"><br>
             &nbsp;Capacity:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;<input type="number" name="capacity"><br>
+            &nbsp;&nbsp;<input  type="number" name="capacity"><br>
             &nbsp;<input type="submit" name="submit" value="add">
             &nbsp;<input type="submit" name="submit" value="delete">
         </form>
@@ -91,34 +91,34 @@
     <div class="boxed4">
         &nbsp;Modify Flights Database
         <form id="flight" action="/modflight" method="post">
-            &nbsp;Flight Num:&nbsp;&nbsp;&nbsp;<input type="number" name="flightnum"><br>
+            &nbsp;Flight Num:&nbsp;&nbsp;&nbsp;<input required type="number" name="flightnum"><br>
             &nbsp;Takeoff:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;<input type="datetime-local" name="takeoff"><br>
+            &nbsp;&nbsp;&nbsp;<input required type="datetime-local" name="takeoff"><br>
             &nbsp;landing:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;<input type="datetime-local" name="landing"><br>
+            &nbsp;&nbsp;&nbsp;&nbsp;<input  type="datetime-local" name="landing"><br>
             &nbsp;Depart Code:                
-                <select name = "depart" id="depart">
+                <select  name = "depart" id="depart">
                     {% for airport in data[0] %}
                         <option id = "airport" value="{{airport}}" SELECTED>{{airport}}</option>
                     {% endfor %} 
                 </select>
             <br>
             &nbsp;Arrival Code:                
-                <select name = "arrival" id="arrival">
+                <select  name = "arrival" id="arrival">
                     {% for airport in data[0] %}
                         <option id = "airport" value="{{airport}}" SELECTED>{{airport}}</option>
                     {% endfor %} 
                 </select>
             <br>
             &nbsp;Plane ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <select name = "numid" id="numid">
+                <select  name = "numid" id="numid">
                     {% for airplane in data[1] %}
                         <option id = "airplane" value="{{airplane}}" SELECTED>{{airplane}}</option>
                     {% endfor %} 
                 </select>
             <br>
             &nbsp;Pilot ID:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <select id="pilot" name = "pilot">
+                <select  id="pilot" name = "pilot">
                     {% for Pilot in data[2] %}
                         <option id = "Pilot" value="{{Pilot}}" SELECTED>{{Pilot}}</option>
                     {% endfor %} 
